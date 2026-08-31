@@ -1,5 +1,11 @@
-#!/bin/sh
-# Compilador da MPL. Chame assim:
-#   ./compilar programa.mpl
-#   ./compilar --tokens programa.mpl
-exec python3 -m mplc.principal "$@"
+#!/usr/bin/env python3
+"""Compilador da MPL. Chame assim:
+  ./compilar programa.mpl
+  ./compilar --tokens programa.mpl
+"""
+import sys
+
+from mplc.principal import main
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))

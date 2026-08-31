@@ -141,3 +141,60 @@ para ninguém perder tempo pelo caminho errado.
    `evidencias/verificacao-N.txt`.
 4. Cada integrante recebe uma cópia por e-mail. **Guardem esse e-mail**: é o
    comprovante.
+
+---
+
+## Tabela de tokens (Entrega 1)
+
+Implementação em `mplc/lexico.py`. A coluna **padrão** descreve o que o
+código reconhece; coincide com [CONTRATOS.md](CONTRATOS.md), seção 2.
+
+| Tipo | Padrão / regra | Exemplo de lexema |
+|---|---|---|
+| `INTEIRO` | `[0-9]+` | `42` |
+| `REAL` | `[0-9]+\.[0-9]+` (dígito dos dois lados do ponto) | `3.14` |
+| `LOGICO` | `verdadeiro` \| `falso` | `verdadeiro` |
+| `TEXTO` | `"` … `"` numa linha; escapes `\n`, `\t`, `\"`, `\\` | `"oi\n"` |
+| `ID` | `[A-Za-z_][A-Za-z0-9_]*`, exceto palavra reservada | `fatorial` |
+| `FUNCAO` | `funcao` | `funcao` |
+| `RETORNE` | `retorne` | `retorne` |
+| `SE` | `se` | `se` |
+| `SENAO` | `senao` | `senao` |
+| `ENQUANTO` | `enquanto` | `enquanto` |
+| `ESCREVA` | `escreva` | `escreva` |
+| `TIPO_INTEIRO` | `inteiro` | `inteiro` |
+| `TIPO_REAL` | `real` | `real` |
+| `TIPO_LOGICO` | `logico` | `logico` |
+| `TIPO_TEXTO` | `texto` | `texto` |
+| `TIPO_VAZIO` | `vazio` | `vazio` |
+| `E` | `e` | `e` |
+| `OU` | `ou` | `ou` |
+| `NAO` | `nao` | `nao` |
+| `MAIS` | `+` | `+` |
+| `MENOS` | `-` | `-` |
+| `VEZES` | `*` | `*` |
+| `DIVIDE` | `/` (não seguido de `/` nem `*`) | `/` |
+| `RESTO` | `%` | `%` |
+| `IGUAL` | `==` | `==` |
+| `DIFERENTE` | `!=` | `!=` |
+| `MENOR` | `<` (não seguido de `=`) | `<` |
+| `MENOR_IGUAL` | `<=` | `<=` |
+| `MAIOR` | `>` (não seguido de `=`) | `>` |
+| `MAIOR_IGUAL` | `>=` | `>=` |
+| `ATRIBUI` | `=` (não seguido de `=`) | `=` |
+| `ABRE_PAR` | `(` | `(` |
+| `FECHA_PAR` | `)` | `)` |
+| `ABRE_CHAVE` | `{` | `{` |
+| `FECHA_CHAVE` | `}` | `}` |
+| `VIRGULA` | `,` | `,` |
+| `PONTO_VIRGULA` | `;` | `;` |
+| `FIM_ARQUIVO` | fim do fonte (lexema vazio) | *(vazio)* |
+
+**Comentários** (não geram token): `//` até fim da linha; `/*` … `*/`
+(sem aninhamento).
+
+**Espaços** ignorados: espaço, tab, `\r`, `\n`.
+
+**Erros léxicos** reportados na linha e coluna do caractere problemático:
+real mal formado (`3.`, `.5`), escape inválido em texto, texto não fechado,
+comentário de bloco não fechado, caractere inválido.
