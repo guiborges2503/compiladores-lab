@@ -77,9 +77,21 @@ class Placar:
         print(f'         esperado: {CINZA}{esperado}{ZERO}')
         print(f'         veio:     {CINZA}{veio}{ZERO}')
 
+def ajustar_cmd(cmd):
+    """No Windows, ./compilar e ./executar sao scripts Python sem extensao —
+    o CreateProcess nao honra shebang. Invoca com o mesmo interpretador."""
+    if os.name != 'nt' or not cmd:
+        return cmd
+    primeiro = cmd[0]
+    base = os.path.basename(primeiro.replace('\\', '/'))
+    if base in ('compilar', 'executar'):
+        caminho = os.path.join(RAIZ, base)
+        return [sys.executable, caminho] + list(cmd[1:])
+    return cmd
+
 def rodar(cmd, entrada=None, limite=20):
     try:
-        p = subprocess.run(cmd, cwd=RAIZ, capture_output=True, text=True, timeout=limite)
+        p = subprocess.run(ajustar_cmd(cmd), cwd=RAIZ, capture_output=True, text=True, timeout=limite)
         return p.returncode, p.stdout, p.stderr
     except subprocess.TimeoutExpired:
         return 124, '', f'passou de {limite} s sem terminar'

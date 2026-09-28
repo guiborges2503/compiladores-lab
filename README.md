@@ -198,3 +198,51 @@ código reconhece; coincide com [CONTRATOS.md](CONTRATOS.md), seção 2.
 **Erros léxicos** reportados na linha e coluna do caractere problemático:
 real mal formado (`3.`, `.5`), escape inválido em texto, texto não fechado,
 comentário de bloco não fechado, caractere inválido.
+
+---
+
+## Gramática (Entrega 2)
+
+Implementação em `mplc/sintatico.py`: descida recursiva, **uma função por
+nível de precedência**. A precedência está codificada na própria gramática —
+cada não-terminal binário só chama o nível imediatamente mais forte à
+direita (associatividade à esquerda); `unario` chama a si mesmo (associatividade
+à direita).
+
+```ebnf
+programa     ::= funcao+
+
+funcao       ::= "funcao" tipo_retorno ID "(" parametros ")" bloco
+tipo_retorno ::= "inteiro" | "real" | "logico" | "texto" | "vazio"
+tipo_var     ::= "inteiro" | "real" | "logico" | "texto"
+
+parametros   ::= [ parametro ( "," parametro )* ]
+parametro    ::= tipo_var ID
+
+bloco        ::= "{" comando* "}"
+
+comando      ::= declaracao
+               | atribuicao
+               | chamada ";"
+               | "se" "(" expr ")" bloco [ "senao" bloco ]
+               | "enquanto" "(" expr ")" bloco
+               | "escreva" "(" expr ")" ";"
+               | "retorne" [ expr ] ";"
+               | bloco
+
+declaracao   ::= tipo_var ID [ "=" expr ] ";"
+atribuicao   ::= ID "=" expr ";"
+chamada      ::= ID "(" [ expr ( "," expr )* ] ")"
+
+(* precedência: do mais fraco ao mais forte — um não-terminal por nível *)
+expr         ::= ou
+ou           ::= e    ( "ou" e )*
+e            ::= ig   ( "e"  ig )*
+ig           ::= rel  ( ( "==" | "!=" ) rel )*
+rel          ::= ad   ( ( "<" | "<=" | ">" | ">=" ) ad )*
+ad           ::= mul  ( ( "+" | "-" ) mul )*
+mul          ::= unario ( ( "*" | "/" | "%" ) unario )*
+unario       ::= "nao" unario | "-" unario | primaria
+primaria     ::= literal | ID | chamada | "(" expr ")"
+literal      ::= INTEIRO | REAL | LOGICO | TEXTO
+```
