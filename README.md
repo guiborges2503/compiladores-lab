@@ -246,3 +246,9 @@ unario       ::= "nao" unario | "-" unario | primaria
 primaria     ::= literal | ID | chamada | "(" expr ")"
 literal      ::= INTEIRO | REAL | LOGICO | TEXTO
 ```
+
+---
+
+## Escopos (Entrega 3)
+
+Os escopos são uma **pilha de dicionários**: o global fica na base e cada bloco novo é empilhado por cima. A busca de um nome começa no topo, então a variável de dentro esconde a de fora enquanto o bloco está aberto e a de fora volta quando aquele escopo é desempilhado. Cada escopo também guarda os símbolos na ordem de declaração e o número do pai, porque o `--tabela` lista os escopos na ordem em que abrem — o da função (parâmetros) e, em seguida, o do bloco, mais um para cada `se` e cada `enquanto`. Na Entrega 4 essa mesma pilha vira memória: a posição do símbolo dentro do escopo é o deslocamento no quadro, e desempilhar o bloco descarta essas posições.
