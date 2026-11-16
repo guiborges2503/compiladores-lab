@@ -252,3 +252,46 @@ literal      ::= INTEIRO | REAL | LOGICO | TEXTO
 ## Escopos (Entrega 3)
 
 Os escopos são uma **pilha de dicionários**: o global fica na base e cada bloco novo é empilhado por cima. A busca de um nome começa no topo, então a variável de dentro esconde a de fora enquanto o bloco está aberto e a de fora volta quando aquele escopo é desempilhado. Cada escopo também guarda os símbolos na ordem de declaração e o número do pai, porque o `--tabela` lista os escopos na ordem em que abrem — o da função (parâmetros) e, em seguida, o do bloco, mais um para cada `se` e cada `enquanto`. Na Entrega 4 essa mesma pilha vira memória: a posição do símbolo dentro do escopo é o deslocamento no quadro, e desempilhar o bloco descarta essas posições.
+
+---
+
+## Conjunto de instruções (Entrega 4)
+
+A VM tem duas pilhas. A **pilha de operandos** guarda valores temporários. A **pilha de quadros** guarda um registro de ativação por chamada: os locais da função e o ponto de volta. `chama` empilha um quadro novo, então a recursão não reaproveita os locais de quem chamou.
+
+O `.mplb` é texto. `funcao`, `quadro`, `parametros`, `linha`, `rotulo`, `fim` e `inicio` organizam o arquivo e não mexem na pilha de operandos. `linha N` só registra a linha do fonte, usada no erro de execução.
+
+- `empilha_int N` — empilha o inteiro N.
+- `empilha_real N` — empilha o real N.
+- `empilha_logico verdadeiro|falso` — empilha o lógico.
+- `empilha_texto "..."` — empilha o texto, já com aspas e escapes como no fonte.
+- `carrega S` — empilha o valor do slot S do quadro atual.
+- `guarda S` — desempilha um valor e grava no slot S do quadro atual.
+- `para_real` — desempilha um inteiro e empilha o mesmo número como real. A divisão inteira já aconteceu antes desta conversão.
+- `soma_int` — desempilha B, desempilha A, empilha A + B inteiro.
+- `soma_real` — desempilha B, desempilha A, empilha A + B real.
+- `soma_texto` — desempilha B, desempilha A, empilha a concatenação A + B.
+- `sub_int` — desempilha B, desempilha A, empilha A − B inteiro.
+- `sub_real` — desempilha B, desempilha A, empilha A − B real.
+- `mul_int` — desempilha B, desempilha A, empilha A * B inteiro.
+- `mul_real` — desempilha B, desempilha A, empilha A * B real.
+- `div_int` — desempilha B, desempilha A, empilha a divisão inteira A / B truncada em direção a zero. B = 0 é erro de execução.
+- `div_real` — desempilha B, desempilha A, empilha A / B real. B = 0 é erro de execução.
+- `resto` — desempilha B, desempilha A, empilha o resto de A % B com o sinal de A. B = 0 é erro de execução.
+- `igual` — desempilha B e A, empilha verdadeiro se A == B.
+- `diferente` — desempilha B e A, empilha verdadeiro se A != B.
+- `menor` — desempilha B e A, empilha verdadeiro se A < B.
+- `menor_igual` — desempilha B e A, empilha verdadeiro se A <= B.
+- `maior` — desempilha B e A, empilha verdadeiro se A > B.
+- `maior_igual` — desempilha B e A, empilha verdadeiro se A >= B.
+- `e_logico` — desempilha B e A, empilha A e B. Os dois lados já foram calculados.
+- `ou_logico` — desempilha B e A, empilha A ou B. Os dois lados já foram calculados.
+- `nao` — desempilha A e empilha a negação lógica.
+- `neg_int` — desempilha A e empilha −A inteiro.
+- `neg_real` — desempilha A e empilha −A real.
+- `escreva` — desempilha um valor e imprime, com quebra de linha.
+- `desvie R` — não mexe na pilha de operandos; o próximo passo é o rótulo R.
+- `desvie_falso R` — desempilha um lógico; se for falso, o próximo passo é o rótulo R.
+- `chama F N` — desempilha N argumentos, empilha um quadro novo de F com esses parâmetros nos primeiros slots e continua no início de F. Se a pilha de quadros passar do limite, é estouro de pilha.
+- `retorne` — desempilha o valor de retorno, desempilha o quadro atual e empilha o valor de volta no chamador.
+- `retorne_vazio` — desempilha o quadro atual e volta ao chamador, sem valor.
